@@ -23,42 +23,31 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
                       telefon: str = "", pol: str = "") -> dict:
 
 
-    # if email == None:
-    #     email = ""
-    # if pasos == None:
-    #     pasos = ""
-    # if drzavljanstvo == None:
-    #     drzavljanstvo = ""
-    # if telefon == None:
-    #     telefon = ""
-    # if pol == None:
-    #     telefon = ""
-
-    if not isinstance(svi_korisnici, dict):
+    if not isinstance(svi_korisnici, dict):    #provera da li je svi_korisnici dictionary
         return "Los unos, svi_korisnici nije tipa dict"
-    if not isinstance(azuriraj, bool):
+    if not isinstance(azuriraj, bool):    #provera da li je azuriraj boolian
         return "Los unos, azuriraj nije boolian"
 
     for parametar in [uloga, korisnicko_ime, lozinka, ime, prezime, email, pasos, drzavljanstvo, telefon, pol]:
-        if not isinstance(parametar, str) or parametar == "":
+        if not isinstance(parametar, str) or parametar == "":    #provera da li su parametri stringovi ili prazni stringovi
             return f"Los unos, {parametar} nije tipa string ili je prazan"
-    if azuriraj and staro_korisnicko_ime == None:
+    if azuriraj and (staro_korisnicko_ime == ""  or staro_korisnicko_ime == None):    #provera da li je prosledjeno staro_korisnicko_ime kada je postavljeno azuriraj na True
         return f"Los unos, azuriraj: {azuriraj} i staro_korisnicko_ime: {staro_korisnicko_ime}"
     
-    for kljuc in svi_korisnici:
+    for kljuc in svi_korisnici:    #provera internih gresaka kljuceva
         if kljuc == None:
             return "Los unos"
         for kljuc_mali in svi_korisnici[kljuc]:
             if kljuc_mali == None:
                 return "Los unos"
 
-    if uloga not in [konstante.ULOGA_ADMIN, konstante.ULOGA_KORISNIK, konstante.ULOGA_PRODAVAC]:
+    if uloga not in [konstante.ULOGA_ADMIN, konstante.ULOGA_KORISNIK, konstante.ULOGA_PRODAVAC]:    #provera da li je prosledjena validna uloga
         return f"Los unos, uloga: {uloga} nije dobrog tipa {konstante.ULOGA_ADMIN} ili {konstante.ULOGA_KORISNIK} ili {konstante.ULOGA_PRODAVAC}"
-    if not pasos.isdecimal() or len(pasos) != 9:
+    if not pasos.isdecimal() or len(pasos) != 9:     #provera da li je pasos u validnom obliku
         return f"Los unos, pasos: {pasos} ne moze biti konvertovan u string ili nema 9 karaktera"
-    if "@" not in email:
+    if "@" not in email:    #provera da li email sadrzi @
         return f"Los unos, email: {email} neam @"
-    else:
+    else:    #provera da li email sadrzi samo jedan poddomen
         email_lista = list(email)
         broj_tacaka = 0
         broj_et = 0
@@ -69,11 +58,11 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
                 broj_et += 1 
         if broj_tacaka != 1 or broj_et != 1 or (email_lista[email_lista.index("@")+1]) == "." or email_lista[email_lista.index("@")] == 0:
             return f"Los unos, email: {email} nije odgovarajuceg oblika"
-    if not telefon.isdecimal():
+    if not telefon.isdecimal():    #provera da li je telefon u validnom obliku
         return f"Los unos, telefon: {telefon} ne moze biti konvertovn u int"
 
-    if azuriraj:
-        if (staro_korisnicko_ime in svi_korisnici and korisnicko_ime not in svi_korisnici) or (staro_korisnicko_ime in svi_korisnici and korisnicko_ime in svi_korisnici and korisnicko_ime == staro_korisnicko_ime):
+    if azuriraj:    #azuriranje svih parametara korisnika
+        if (staro_korisnicko_ime in svi_korisnici and korisnicko_ime not in svi_korisnici) or (staro_korisnicko_ime in svi_korisnici and korisnicko_ime in svi_korisnici and korisnicko_ime == staro_korisnicko_ime):    #provera da li je novo korisnicko ime vec zauzeto
             svi_korisnici[staro_korisnicko_ime]["korisnicko_ime"] = korisnicko_ime
             svi_korisnici[staro_korisnicko_ime]["lozinka"] = lozinka
             svi_korisnici[staro_korisnicko_ime]["ime"] = ime
@@ -91,8 +80,8 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
         else:
             return f"Los unos, staro_korisnicko_ime: {staro_korisnicko_ime} se ne nalazi u svi korisnici: {svi_korisnici}"
         
-    else:
-        if korisnicko_ime not in svi_korisnici:
+    else:    #dodavanje novog korisnika u dictionary svi_korisnici
+        if korisnicko_ime not in svi_korisnici:    #provera da li je korisnicko ime vec zauzeto
             svi_korisnici[korisnicko_ime] = {}
             svi_korisnici[korisnicko_ime]["korisnicko_ime"] = korisnicko_ime
             svi_korisnici[korisnicko_ime]["lozinka"] = lozinka
@@ -113,29 +102,29 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
 Funkcija koja čuva podatke o svim korisnicima u fajl na zadatoj putanji sa zadatim separatorom.
 """
 def sacuvaj_korisnike(putanja: str, separator: str, svi_korisnici: dict):
-    HEADERS_LISTA = ["korisnicko_ime","lozinka","ime","prezime","uloga","pasos","drzavljanstvo","telefon","email","pol"]
+    HEADERS_LISTA = common.konstante.PARAMETRI
     with open(putanja, "w") as f:
-        for key in svi_korisnici:
-            korisnik_dict = svi_korisnici[key]
-            linija_lista = []
+        for key in svi_korisnici:    #prolazak kroz sve korisnike
+            korisnik_dict = svi_korisnici[key]    #dictionary trenutnog korisnika
+            linija_lista = []    #lista koja ce sadrzati parametre
             for parametar in HEADERS_LISTA:
-                linija_lista.append(korisnik_dict[parametar])
-            linija = separator.join(linija_lista)
+                linija_lista.append(korisnik_dict[parametar])    #dodavanje parametara trenutnog korisnika u listu
+            linija = separator.join(linija_lista)    #konverovanje liste u liniju(korisnika) u csv formatu
             f.write(linija+"\n")
 
 """
 Funkcija koja učitava sve korisnika iz fajla na putanji sa zadatim separatorom. Kao rezultat vraća učitane korisnike.
 """
 def ucitaj_korisnike_iz_fajla(putanja: str, separator: str) -> dict:
-    ucitani_korisnici = {}
-    HEADERS_LISTA = ["korisnicko_ime","lozinka","ime","prezime","uloga","pasos","drzavljanstvo","telefon","email","pol"]
+    ucitani_korisnici = {}    
+    HEADERS_LISTA = common.konstante.PARAMETRI
     with open(putanja, "r") as f:
-        for korisnik in f:
-            korisnik = korisnik.split(separator)
-            korisnik[-1] = korisnik[-1][:-1]
-            ucitani_korisnici[korisnik[HEADERS_LISTA.index("korisnicko_ime")]] = {}
+        for korisnik in f:    #prolazak kroz sve linije(korisnike)
+            korisnik = korisnik.split(separator)    #korisnik je ovde lista sa vrednostima parametara korisnika
+            korisnik[-1] = korisnik[-1][:-1]    #uklanjanje \n sa kraja linije
+            ucitani_korisnici[korisnik[HEADERS_LISTA.index("korisnicko_ime")]] = {}    #postavljanje kljuca na dictionary korisnika i pravljenje samog dictionary-a za korisnika 
             for parametar in HEADERS_LISTA:
-                ucitani_korisnici[korisnik[HEADERS_LISTA.index("korisnicko_ime")]][parametar] = korisnik[HEADERS_LISTA.index(parametar)] 
+                ucitani_korisnici[korisnik[HEADERS_LISTA.index("korisnicko_ime")]][parametar] = korisnik[HEADERS_LISTA.index(parametar)]    #postavljanje parametara za svakog korisnika u njegovom dictionary-u
     return ucitani_korisnici
 
 """
@@ -144,7 +133,7 @@ CHECKPOINT 1: Vraća string sa greškom ako korisnik nije pronađen.
 ODBRANA: Baca grešku sa porukom ako korisnik nije pronađen.
 """
 def login(svi_korisnici, korisnicko_ime, lozinka) -> dict:
-    if korisnicko_ime in svi_korisnici and svi_korisnici[korisnicko_ime]["korisnicko_ime"] == korisnicko_ime and svi_korisnici[korisnicko_ime]["lozinka"] == lozinka:
+    if korisnicko_ime in svi_korisnici and svi_korisnici[korisnicko_ime]["korisnicko_ime"] == korisnicko_ime and svi_korisnici[korisnicko_ime]["lozinka"] == lozinka:    #provera da li korisnik postoji i da li su njegovi uneti parametri validni
         return svi_korisnici[korisnicko_ime]
     else:
         return f"Los unos, korisnicko_ime i lozinka: {korisnicko_ime} : {lozinka} se ne nalaze u svi korisnici: {svi_korisnici}"
