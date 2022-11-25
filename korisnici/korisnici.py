@@ -28,10 +28,10 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
     if not isinstance(azuriraj, bool):    #provera da li je azuriraj boolian
         return "Los unos, azuriraj nije boolian"
 
-    for parametar in [uloga, korisnicko_ime, lozinka, ime, prezime, email, pasos, drzavljanstvo, telefon, pol]:
-        if not isinstance(parametar, str) or parametar == "":    #provera da li su parametri stringovi ili prazni stringovi
+    for parametar in [uloga, korisnicko_ime, lozinka, ime, prezime, email, telefon]:
+        if not isinstance(parametar, str) or parametar == "" or parametar == None:    #provera da li su parametri stringovi ili prazni stringovi
             return f"Los unos, {parametar} nije tipa string ili je prazan"
-    if azuriraj and (staro_korisnicko_ime == ""  or staro_korisnicko_ime == None):    #provera da li je prosledjeno staro_korisnicko_ime kada je postavljeno azuriraj na True
+    if azuriraj and (staro_korisnicko_ime == ""  or staro_korisnicko_ime == None or not isinstance(staro_korisnicko_ime, str)):    #provera da li je prosledjeno staro_korisnicko_ime kada je postavljeno azuriraj na True
         return f"Los unos, azuriraj: {azuriraj} i staro_korisnicko_ime: {staro_korisnicko_ime}"
     
     for kljuc in svi_korisnici:    #provera internih gresaka kljuceva
@@ -43,7 +43,7 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
 
     if uloga not in [konstante.ULOGA_ADMIN, konstante.ULOGA_KORISNIK, konstante.ULOGA_PRODAVAC]:    #provera da li je prosledjena validna uloga
         return f"Los unos, uloga: {uloga} nije dobrog tipa {konstante.ULOGA_ADMIN} ili {konstante.ULOGA_KORISNIK} ili {konstante.ULOGA_PRODAVAC}"
-    if not pasos.isdecimal() or len(pasos) != 9:     #provera da li je pasos u validnom obliku
+    if pasos != "" and pasos != None and (not pasos.isdecimal() or len(pasos) != 9):     #provera da li je pasos u validnom obliku
         return f"Los unos, pasos: {pasos} ne moze biti konvertovan u string ili nema 9 karaktera"
     if "@" not in email:    #provera da li email sadrzi @
         return f"Los unos, email: {email} neam @"
@@ -74,7 +74,7 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
             svi_korisnici[staro_korisnicko_ime]["telefon"] = telefon
             svi_korisnici[staro_korisnicko_ime]["pol"] = pol
 
-            svi_korisnici[korisnicko_ime] = svi_korisnici.pop(staro_korisnicko_ime)
+            svi_korisnici[korisnicko_ime] = svi_korisnici.pop(staro_korisnicko_ime)    #menja kljuc i zadrzava vrednosti na koje je ukazivao prosli kljuc
 
             return svi_korisnici
         else:
@@ -96,13 +96,13 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
             return svi_korisnici
         else:
             return f"Los unos, korisnicko_ime: {korisnicko_ime} vec postoji u svi_korisnici: {svi_korisnici}"
-   
+
 
 """
 Funkcija koja čuva podatke o svim korisnicima u fajl na zadatoj putanji sa zadatim separatorom.
 """
 def sacuvaj_korisnike(putanja: str, separator: str, svi_korisnici: dict):
-    HEADERS_LISTA = common.konstante.PARAMETRI
+    HEADERS_LISTA = konstante.PARAMETRI
     with open(putanja, "w") as f:
         for key in svi_korisnici:    #prolazak kroz sve korisnike
             korisnik_dict = svi_korisnici[key]    #dictionary trenutnog korisnika
@@ -117,7 +117,7 @@ Funkcija koja učitava sve korisnika iz fajla na putanji sa zadatim separatorom.
 """
 def ucitaj_korisnike_iz_fajla(putanja: str, separator: str) -> dict:
     ucitani_korisnici = {}    
-    HEADERS_LISTA = common.konstante.PARAMETRI
+    HEADERS_LISTA = konstante.PARAMETRI
     with open(putanja, "r") as f:
         for korisnik in f:    #prolazak kroz sve linije(korisnike)
             korisnik = korisnik.split(separator)    #korisnik je ovde lista sa vrednostima parametara korisnika
