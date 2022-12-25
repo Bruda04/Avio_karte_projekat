@@ -16,7 +16,6 @@ if __name__ == "__main__":
         "datum_pocetka_operativnosti": datetime,
         "datum_kraja_operativnosti": datetime
     }
-    
     konkretan_let ={
         "sifra": int,
         "broj_leta": str,
@@ -40,5 +39,6 @@ if __name__ == "__main__":
         "obrisana": bool,
         "datum_prodaje": datetime,
         "prodavac": str,
-        "kupac": str
+        "kupac": str,
+        "sifra_sedista": str,
     }

@@ -1,6 +1,7 @@
 import common.konstante
 from common import konstante
 
+
 """
 Funkcija koja kreira novi rečnik koji predstavlja korisnika sa prosleđenim vrednostima. Kao rezultat vraća kolekciju
 svih korisnika proširenu novim korisnikom. Može se ponašati kao dodavanje ili ažuriranje, u zavisnosti od vrednosti
@@ -16,7 +17,6 @@ CHECKPOINT 1: Vraća string sa greškom ako podaci nisu validni.
     Hint: Postoji string funkcija koja proverava da li je string broj bez bacanja grešaka. Probajte da je pronađete.
 ODBRANA: Baca grešku sa porukom ako podaci nisu validni.
 """
-
 def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_korisnicko_ime: str, 
                       korisnicko_ime: str, lozinka: str, ime: str, prezime: str, email: str = "",
                       pasos: str = "", drzavljanstvo: str = "",
@@ -98,7 +98,6 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
         else:
             raise Exception(f"Los unos, korisnicko_ime: {korisnicko_ime} vec postoji u svi_korisnici: {svi_korisnici}")
 
-
 """
 Funkcija koja čuva podatke o svim korisnicima u fajl na zadatoj putanji sa zadatim separatorom.
 """
@@ -128,7 +127,7 @@ def ucitaj_korisnike_iz_fajla(putanja: str, separator: str) -> dict:
                 ucitani_korisnici[korisnik[HEADERS_LISTA.index("korisnicko_ime")]][parametar] = korisnik[HEADERS_LISTA.index(parametar)]    #postavljanje parametara za svakog korisnika u njegovom dictionary-u
     return ucitani_korisnici
 
-ulogovan = None
+ulogovan = None    #globalna promenljiva sa vrednosti recnika ulogovanog korisnika
 
 """
 Funkcija koja vraća korisnika sa zadatim korisničkim imenom i šifrom.
@@ -143,16 +142,16 @@ def login(svi_korisnici, korisnicko_ime, lozinka) -> dict:
     else:
         raise Exception(f"Los unos, korisnicko_ime i lozinka: {korisnicko_ime} : {lozinka} se ne nalaze u svi korisnici: {svi_korisnici}")
 
-
-
 """
 Funkcija koja vrsi log out
 *
 """
 def logout(korisnicko_ime: str):
     global ulogovan
-    ulogovan = None
-
+    if ulogovan == korisnicko_ime:      #vracanje globalne promeljive na None
+        ulogovan = None
+    else:
+        raise Exception("Nije ta osoba ulogovana")
 
 """
 Funkcija koja vraca recnik korisnika koji je ulogovan
@@ -160,4 +159,3 @@ Funkcija koja vraca recnik korisnika koji je ulogovan
 def ko_je_ulogovan() -> dict:
     global ulogovan
     return ulogovan
-
