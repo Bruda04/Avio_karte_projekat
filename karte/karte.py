@@ -34,6 +34,10 @@ def kupovina_karte(
 
     try:
         prodavac = kwargs["prodavac"]
+    except KeyError:
+        pass
+
+    try:
         datum_prodaje = kwargs["datum_prodaje"]
     except KeyError:
         pass
