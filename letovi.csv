@@ -1,3 +1,9 @@
-ns19|rwz|bdq|10:57|00:23|False|cfjpsgqqrr|[3, 6]|{'id': 123, 'naziv': 'wtfvbcxwhq', 'broj_redova': 26, 'pozicije_sedista': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}|160.39173367649914
-aa34|TYO|bdq|10:57|00:23|False|cfjpsgqqrr|[3, 6]|{'id': 123, 'naziv': 'wtfvbcxwhq', 'broj_redova': 26, 'pozicije_sedista': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}|160.39173367649914
-aa35|rwz|bdq|10:57|00:23|False|cfjpsgqqrr|[3, 6]|{'id': 123, 'naziv': 'wtfvbcxwhq', 'broj_redova': 26, 'pozicije_sedista': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}|100.39173367649914
+bh01|beg|her|13:00|15:00|False|Air Serbia|[0, 2, 4, 6]|2023-02-08 19:00:00|2023-03-08 19:00:00|{'id': 0, 'naziv': 'boeing', 'broj_redova': 11, 'pozicije_sedista': ['A', 'B', 'C']}|500.0
+hc01|her|cha|16:00|16:30|False|Aegean|[0, 2, 4, 6]|2023-02-08 19:00:00|2023-03-08 19:00:00|{'id': 1, 'naziv': 'airbus', 'broj_redova': 10, 'pozicije_sedista': ['A', 'B']}|200.0
+ba01|beg|ath|9:00|10:00|False|Aegean|[1, 3, 5]|2023-02-08 07:00:00|2023-03-08 07:00:00|{'id': 2, 'naziv': 'airbus', 'broj_redova': 6, 'pozicije_sedista': ['A', 'B', 'C', 'D']}|300.0
+bp01|beg|pdg|14:00|15:00|False|Monte|[2]|2023-02-08 12:00:00|2023-03-08 12:00:00|{'id': 1, 'naziv': 'airbus', 'broj_redova': 10, 'pozicije_sedista': ['A', 'B']}|100.0
+cp01|cha|pdg|17:30|18:00|False|Monte|[0, 2, 4, 6]|2023-02-08 12:00:00|2023-03-08 12:00:00|{'id': 1, 'naziv': 'airbus', 'broj_redova': 10, 'pozicije_sedista': ['A', 'B']}|250.0
+bn01|beg|nyc|15:00|3:00|True|Air Serbia|[0]|2023-02-08 12:00:00|2023-03-08 12:00:00|{'id': 2, 'naziv': 'airbus', 'broj_redova': 6, 'pozicije_sedista': ['A', 'B', 'C', 'D']}|1500.0
+pn01|pdg|nyc|13:00|01:00|True|Monte|[6]|2023-02-20 10:00:00|2023-03-20 10:00:00|{'id': 0, 'naziv': 'boeing', 'broj_redova': 11, 'pozicije_sedista': ['A', 'B', 'C']}|1500.0
+an01|ath|nyc|10:00|23:00|False|Aegean|[5]|2023-02-10 10:00:00|2023-03-10 10:00:00|{'id': 0, 'naziv': 'boeing', 'broj_redova': 11, 'pozicije_sedista': ['A', 'B', 'C']}|1000.0
+pn02|pdg|nyc|11:00|23:00|False|Monte|[0, 3]|2023-02-10 10:00:00|2023-03-10 10:00:00|{'id': 0, 'naziv': 'boeing', 'broj_redova': 11, 'pozicije_sedista': ['A', 'B', 'C']}|1000.0

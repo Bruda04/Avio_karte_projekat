@@ -1,22 +1,23 @@
 from common import konstante
-from datetime import datetime
-
+from datetime import datetime, date, timedelta
+#from konkretni_letovi.konkretni_letovi import kreiranje_konkretnog_leta, sacuvaj_kokretan_let, ucitaj_konkretan_let
 
 """
 Funkcija koja omogucuje korisniku da pregleda informacije o letovima
 Ova funkcija sluzi samo za prikaz
 """
-def pregled_nerealizovanih_letova(svi_letovi: dict):
-    pass
+def pregled_nerealizoivanih_letova(svi_letovi: dict):
+    letovi = [svi_letovi[let] for let in svi_letovi if svi_letovi[let]["datum_pocetka_operativnosti"] >= datetime.now()]
+    return letovi
 
 """
 Funkcija koja omogucava pretragu leta po yadatim kriterijumima. Korisnik moze da zada jedan ili vise kriterijuma.
 Povratna vrednost je lista konkretnih letova.
 vreme_poletanja i vreme_sletanja su u formatu hh:mm
 """
-def pretraga_letova(svi_letovi: dict, konkretni_letovi:dict, polaziste: str = "", odrediste: str = "", datum_polaska: datetime = None, datum_dolaska: datetime = None,
-                    vreme_poletanja: str = "", vreme_sletanja: str = "", prevoznik: str = "")->list:
-    
+def pretraga_letova(svi_letovi: dict, konkretni_letovi:dict, polaziste: str = "", odrediste: str = "",
+                    datum_polaska: datetime = None, datum_dolaska: datetime = None,
+                    vreme_poletanja: str = "", vreme_sletanja: str = "", prevoznik: str = "") -> list:
     letovi = []
 
     if not isinstance(svi_letovi, dict):    #porvera oblika svi_letovi
@@ -35,8 +36,8 @@ def pretraga_letova(svi_letovi: dict, konkretni_letovi:dict, polaziste: str = ""
             for konkretan_let in konkretni_letovi:
                 if (
                     konkretni_letovi[konkretan_let]["broj_leta"] == let and 
-                    (konkretni_letovi[konkretan_let]["datum_i_vreme_polaska"] == datum_polaska or not datum_polaska) and
-                    (konkretni_letovi[konkretan_let]["datum_i_vreme_dolaska"] == datum_dolaska or not datum_dolaska)
+                    (not datum_polaska or konkretni_letovi[konkretan_let]["datum_i_vreme_polaska"].date() == datum_polaska.date()) and
+                    (not datum_dolaska or konkretni_letovi[konkretan_let]["datum_i_vreme_dolaska"].date() == datum_dolaska.date())
                 ):
                     letovi.append(konkretni_letovi[konkretan_let])      #dodaj let u povratnu listu ako je prosao sve provere
             
@@ -46,15 +47,27 @@ def pretraga_letova(svi_letovi: dict, konkretni_letovi:dict, polaziste: str = ""
 Funkcija koja trazi 10 najjeftinijih letova po opadajucem redosledu
 """
 def trazenje_10_najjeftinijih_letova(svi_letovi: dict, polaziste: str = "", odrediste: str =""):
-
-    letovi = list((svi_letovi[key]["broj_leta"], svi_letovi[key]["cena"])       #vraca broj leta i cenu tuple
+    odgovarajuci = 0
+    for let in svi_letovi:
+        if (
+        (svi_letovi[let]["sifra_polazisnog_aerodroma"] == polaziste or not polaziste) and 
+        (svi_letovi[let]["sifra_odredisnog_aerodorma"] == odrediste or not odrediste)
+        ):
+            odgovarajuci +=1 
+    if odgovarajuci == 0:
+        raise Exception("Nema odgovarjucih letova")
+    
+    letovi = list((svi_letovi[key])       #vraca broj leta i cenu tuple
      for key in svi_letovi.keys()
      if (svi_letovi[key]["sifra_polazisnog_aerodroma"] == polaziste or not polaziste) and       #za odgovarajuce polaziste i odrediste
      (svi_letovi[key]["sifra_odredisnog_aerodorma"] == odrediste or not odrediste))
 
-    letovi.sort(key = lambda k : k[1], reverse = True)      #sortiranje po lambda funkciji koja izvlaci parametar cena
 
-    return letovi[0:9]      #vracanje prvih 10
+    letovi.sort(key = lambda k : k["cena"], reverse=True)      #sortiranje po lambda funkciji koja izvlaci parametar cena
+    return letovi[-10:]      #vracanje poslednjih 10
+
+    # letovi.sort(key = lambda k : k["cena"])      #sortiranje po lambda funkciji koja izvlaci parametar cena
+    # return letovi[:9]      #vracanje poslednjih 10
 
 """
 Funkcija koja kreira novi rečnik koji predstavlja let sa prosleđenim vrednostima. Kao rezultat vraća kolekciju
@@ -63,15 +76,15 @@ Ova funkcija proverava i validnost podataka o letu. Paziti da kada se kreira let
 vreme_poletanja i vreme_sletanja su u formatu hh:mm
 CHECKPOINT2: Baca grešku sa porukom ako podaci nisu validni.
 """
-def kreiranje_letova(svi_letovi : dict, broj_leta: str, sifra_polazisnog_aerodroma: str, sifra_odredisnog_aerodorma: str,
+def kreiranje_letova(svi_letovi : dict, broj_leta: str, sifra_polazisnog_aerodroma: str,
+                     sifra_odredisnog_aerodorma: str,
                      vreme_poletanja: str, vreme_sletanja: str, sletanje_sutra: bool, prevoznik: str,
                      dani: list, model: dict, cena: float,  datum_pocetka_operativnosti: datetime = None ,
                     datum_kraja_operativnosti: datetime = None):
-
     if not isinstance(svi_letovi, dict):    
         raise Exception("svi_letovi nije oblika dict")
 
-    if not isinstance(broj_leta, str) or len(broj_leta) !=4 or not broj_leta[:2].isalpha() or not broj_leta[2:].isnumeric():       
+    if not isinstance(broj_leta, str) or len(broj_leta) != 4 or not broj_leta[:2].isalpha() or not broj_leta[2:].isnumeric():       
         raise Exception("broj_leta nije oblika str ili nije odgovarajuceg oblika")
 
     if not isinstance(sifra_polazisnog_aerodroma, str) or len(sifra_polazisnog_aerodroma) != 3 or not sifra_polazisnog_aerodroma.isalpha():    
@@ -83,7 +96,7 @@ def kreiranje_letova(svi_letovi : dict, broj_leta: str, sifra_polazisnog_aerodro
     if not isinstance(vreme_poletanja, str):    
        raise Exception("vreme_poletanja nije oblika str")
 
-    try:    datetime.strptime(vreme_poletanja, "%H:%S")     #Provera da li prosledjeno vreme moze da se pretvori u odgovarajuci oblik
+    try:    datetime.strptime(vreme_poletanja, "%H:%M")     #Provera da li prosledjeno vreme moze da se pretvori u odgovarajuci oblik
     except ValueError:
         raise Exception("vreme_poletanja nije odgovarajuceg formata")
 
@@ -92,31 +105,31 @@ def kreiranje_letova(svi_letovi : dict, broj_leta: str, sifra_polazisnog_aerodro
         raise Exception("vreme_sletanja nije odgovarajuceg formata")
 
 
-    try:    datetime.strptime(vreme_sletanja, "%H:%S")      #Provera da li prosledjeno vreme moze da se pretvori u odgovarajuci oblik
+    try:    datetime.strptime(vreme_sletanja, "%H:%M")      #Provera da li prosledjeno vreme moze da se pretvori u odgovarajuci oblik
     except ValueError:
-        raise Exception("Los unos")
+        raise Exception("Vreme sletanja nije dobrog formata")
 
 
     if not isinstance(sletanje_sutra, bool):    
-        raise Exception("Los unos")
+        raise Exception("Sletanje sutra nije validnog formata")
 
     if not isinstance(prevoznik, str) or not prevoznik:    
-        raise Exception("Los unos")
+        raise Exception("Prevoznik nije lepo unet")
 
     if not isinstance(dani, list) or len(dani) == 0:    
-        raise Exception("Los unos")
+        raise Exception("Dani nisu lista")
 
     if not isinstance(datum_pocetka_operativnosti, datetime):    
-        raise Exception("Los unos")
+        raise Exception("Datum pocetka operativnosti nije dobrog formata")
 
     if not isinstance(datum_kraja_operativnosti, datetime):    
-        raise Exception("Los unos")
+        raise Exception("Datum kraja operativnosti nije dobrog formata")
 
     if not isinstance(model, dict) or len(model) == 0:     
-        raise Exception("Los unos")
+        raise Exception("Nema tog modela aviona")
 
     if not isinstance(cena, float):    
-        raise Exception("Los unos")
+        raise Exception("Cena mora biti float")
 
     if datum_pocetka_operativnosti >= datum_kraja_operativnosti:
         raise Exception("kraj operativnost ne moze biti pre pocetka operativnosti")
@@ -136,11 +149,15 @@ def kreiranje_letova(svi_letovi : dict, broj_leta: str, sifra_polazisnog_aerodro
         svi_letovi[broj_leta]["datum_kraja_operativnosti"] = datum_kraja_operativnosti 
         svi_letovi[broj_leta]["model"] = model
         svi_letovi[broj_leta]["cena"] = cena
+        
+        # svi_konkretni_letovi = ucitaj_konkretan_let("konkretni_letovi.csv", "|")
+        # novi_konkretni_letovi = kreiranje_konkretnog_leta(svi_konkretni_letovi, svi_letovi[broj_leta])
+        # sacuvaj_kokretan_let("konkretni_letovi.csv", "|", novi_konkretni_letovi)
 
         return svi_letovi        
 
     else:
-        raise Exception(f"Los unos")
+        raise Exception(f"Broj leta vec postoji")
 
 """
 Funkcija koja menja let sa prosleđenim vrednostima. Kao rezultat vraća kolekciju
@@ -170,14 +187,14 @@ def izmena_letova(svi_letovi : dict, broj_leta: str, sifra_polazisnog_aerodroma:
     if not isinstance(vreme_poletanja, str):    
         raise Exception("Los unos")
 
-    try:    datetime.strptime(vreme_poletanja, "%H:%S")
+    try:    datetime.strptime(vreme_poletanja, "%H:%M")
     except ValueError:
         raise Exception("Los unos")
 
     if not isinstance(vreme_sletanja, str):    
         raise Exception("Los unos")
 
-    try:    datetime.strptime(vreme_sletanja, "%H:%S")
+    try:    datetime.strptime(vreme_sletanja, "%H:%M")
     except ValueError:
         raise Exception("Los unos")
 
@@ -219,6 +236,17 @@ def izmena_letova(svi_letovi : dict, broj_leta: str, sifra_polazisnog_aerodroma:
         svi_letovi[broj_leta]["datum_kraja_operativnosti"] = datum_kraja_operativnosti 
         svi_letovi[broj_leta]["model"] = model
         svi_letovi[broj_leta]["cena"] = cena
+
+        # svi_konkretni_letovi = ucitaj_konkretan_let("konkretni_letovi.csv", "|")
+        # svi_konkretni_letovi_copy = {}
+        
+        # for konkretan_let in svi_konkretni_letovi:
+        #     if svi_konkretni_letovi[konkretan_let]["broj_leta"] != broj_leta:
+        #         # del svi_konkretni_letovi_copy[konkretan_let]
+        #         svi_konkretni_letovi_copy[konkretan_let] = svi_konkretni_letovi[konkretan_let]
+
+        # novi_konkretni_letovi = kreiranje_konkretnog_leta(svi_konkretni_letovi_copy, svi_letovi[broj_leta])
+        # sacuvaj_kokretan_let("konkretni_letovi.csv", "|", novi_konkretni_letovi)
 
         return svi_letovi        
 
@@ -292,9 +320,106 @@ def podesi_matricu_zauzetosti(svi_letovi, konkretan_let):
 
     konkretan_let["zauzetost"] = matrica    #postavljanje matrice na parametar zauzetost
 
+    return matrica
+
 """
 Funkcija koja vraća matricu zauzetosti sedišta. Svaka stavka sadrži oznaku pozicije i oznaku reda.
 Primer: [[True, False], [False, True]] -> A1 i B2 su zauzeti, A2 i B1 su slobodni
 """
 def matrica_zauzetosti(konkretan_let):
     return konkretan_let["zauzetost"]
+
+"""
+Funkcija koja zauzima sedište na datoj poziciji u redu, najkasnije 48h pre poletanja. Redovi počinju od 1. 
+Vraća grešku ako se sedište ne može zauzeti iz bilo kog razloga.
+"""
+def checkin(karta, svi_letovi: dict, konkretni_let: dict, red: int, pozicija: str) -> dict: #(dict, dict)
+    rok = 48
+    matrica = matrica_zauzetosti(konkretni_let)
+    broj_leta = konkretni_let["broj_leta"]
+    let  = svi_letovi[broj_leta]
+    model = let["model"]
+    vreme_poletanja = konkretni_let["datum_i_vreme_polaska"]
+
+    if datetime.now() > vreme_poletanja - timedelta(hours = rok):
+        raise Exception("Prosao je rok za checkin")
+    
+    if red-1 > model["broj_redova"] or pozicija not in model["pozicije_sedista"]:
+        raise Exception("Nevalidan pozicija")
+
+    kolona = model["pozicije_sedista"].index(pozicija)
+
+    if matrica[red-1][kolona]:
+        raise Exception("Mesto zauzeto")
+    
+    matrica[red-1][kolona] = True
+
+    konkretni_let["zauzetost"] = matrica
+    karta["status"] = konstante.STATUS_REALIZOVANA_KARTA
+    sediste = pozicija + str(red)
+    karta["sediste"] = sediste
+
+    return (konkretni_let, karta)
+
+"""
+Funkcija koja vraća listu konkretni letova koji zadovoljavaju sledeće uslove:
+1. Polazište im je jednako odredištu prosleđenog konkretnog leta
+2. Vreme i mesto poletanja im je najviše 120 minuta nakon sletanja konkretnog leta
+"""
+def povezani_letovi(svi_letovi: dict, svi_konkretni_letovi: dict, konkretni_let: dict) -> list:
+    if konkretni_let not in svi_konkretni_letovi.values() or konkretni_let["broj_leta"] not in svi_letovi:
+        raise Exception("Nepostoji prosledjeni konkretni let")
+    
+    mesto_presedanja = svi_letovi[konkretni_let["broj_leta"]]["sifra_odredisnog_aerodorma"]
+
+    letovi = [svi_konkretni_letovi[konkretno] for konkretno in svi_konkretni_letovi if 
+    (svi_letovi[svi_konkretni_letovi[konkretno]["broj_leta"]]["sifra_polazisnog_aerodroma"]) == mesto_presedanja and
+    ((konkretni_let["datum_i_vreme_dolaska"] + timedelta(minutes=120)) >= svi_konkretni_letovi[konkretno]["datum_i_vreme_polaska"]) and 
+    (konkretni_let["datum_i_vreme_dolaska"] <= svi_konkretni_letovi[konkretno]["datum_i_vreme_polaska"])]
+    
+    if len(letovi) == 0:
+        raise Exception("Nije pronadjen odgovarjuci povezani let")
+    return letovi
+
+"""
+Funkcija koja vraća sve konkretne letove čije je vreme polaska u zadatom opsegu, +/- zadati broj fleksibilnih dana
+"""
+def fleksibilni_polasci(svi_letovi: dict, konkretni_letovi: dict, polaziste: str, odrediste: str,
+                        datum_polaska: date, broj_fleksibilnih_dana: int, datum_dolaska: date) -> list:
+    
+    if not isinstance(svi_letovi, dict):    #porvera oblika svi_letovi
+        raise Exception("Svi_letovi nije oblika dict")
+        
+    if not isinstance(konkretni_letovi, dict):    #porvera oblika konkretni_letovi
+        raise Exception("konkretni_letovi nije oblika dict")
+
+    if not isinstance(datum_dolaska, datetime):    #porvera oblika konkretni_letovi
+        raise Exception("datum_dolaska nije oblika dd.mm.yyyy.")
+
+    if not isinstance(datum_polaska, datetime):    #porvera oblika konkretni_letovi
+        raise Exception("datum_polaska nije oblika dd.mm.yyyy.")
+
+    
+    
+    letovi = []
+    
+
+    polazak_min = datum_polaska - timedelta(days=broj_fleksibilnih_dana)
+    polazak_max = datum_polaska + timedelta(days=broj_fleksibilnih_dana)
+    dolazak_min = datum_dolaska - timedelta(days=broj_fleksibilnih_dana)
+    dolazak_max = datum_dolaska + timedelta(days=broj_fleksibilnih_dana)
+
+
+    for let in svi_letovi:
+        if ((svi_letovi[let]["sifra_polazisnog_aerodroma"] == polaziste or not polaziste) and    #da li su parametri uneti i odgovarajuci ili nisu uneti
+            (svi_letovi[let]["sifra_odredisnog_aerodorma"] == odrediste or not odrediste)
+            ):
+            for konkretan_let in konkretni_letovi:
+                if (
+                    konkretni_letovi[konkretan_let]["broj_leta"] == let and 
+                    ((konkretni_letovi[konkretan_let]["datum_i_vreme_polaska"] >= polazak_min and konkretni_letovi[konkretan_let]["datum_i_vreme_polaska"] <= polazak_max) or not datum_polaska) and
+                    ((konkretni_letovi[konkretan_let]["datum_i_vreme_dolaska"] >= dolazak_min and konkretni_letovi[konkretan_let]["datum_i_vreme_dolaska"] <= dolazak_max) or not datum_dolaska)
+                ):
+                    letovi.append(konkretni_letovi[konkretan_let])      #dodaj let u povratnu listu ako je prosao sve provere
+            
+    return letovi

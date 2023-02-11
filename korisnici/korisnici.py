@@ -28,10 +28,12 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
     if not isinstance(azuriraj, bool):    #provera da li je azuriraj boolian
         raise Exception("Los unos, azuriraj nije boolian")
 
-    for parametar in [uloga, korisnicko_ime, lozinka, ime, prezime, email, telefon]:
+    # for parametar in [uloga, korisnicko_ime, lozinka, ime, prezime, email, telefon]:
+    for parametar in [uloga, korisnicko_ime, lozinka, ime, prezime]:
         if not isinstance(parametar, str) or parametar == "" or parametar == None:    #provera da li su parametri stringovi ili prazni stringovi
             raise Exception(f"Los unos, {parametar} nije tipa string ili je prazan")
-    if azuriraj and (staro_korisnicko_ime == ""  or staro_korisnicko_ime == None or not isinstance(staro_korisnicko_ime, str)):    #provera da li je prosledjeno staro_korisnicko_ime kada je postavljeno azuriraj na True
+
+    if azuriraj and (staro_korisnicko_ime == "" or staro_korisnicko_ime == None or not isinstance(staro_korisnicko_ime, str)):    #provera da li je prosledjeno staro_korisnicko_ime kada je postavljeno azuriraj na True
         raise Exception(f"Los unos, azuriraj: {azuriraj} i staro_korisnicko_ime: {staro_korisnicko_ime}")
     
     for kljuc in svi_korisnici:    #provera internih gresaka kljuceva
@@ -45,9 +47,9 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
         raise Exception(f"Los unos, uloga: {uloga} nije dobrog tipa {konstante.ULOGA_ADMIN} ili {konstante.ULOGA_KORISNIK} ili {konstante.ULOGA_PRODAVAC}")
     if pasos != "" and pasos != None and (not pasos.isdecimal() or len(pasos) != 9):     #provera da li je pasos u validnom obliku
         raise Exception(f"Los unos, pasos: {pasos} ne moze biti konvertovan u string ili nema 9 karaktera")
-    if "@" not in email:    #provera da li email sadrzi @
+    if "@" not in email and email:    #provera da li email sadrzi @
         raise Exception(f"Los unos, email: {email} neam @")
-    else:    #provera da li email sadrzi samo jedan poddomen
+    if email:    #provera da li email sadrzi samo jedan poddomen
         email_lista = list(email)
         broj_tacaka = 0
         broj_et = 0
@@ -58,7 +60,7 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
                 broj_et += 1 
         if broj_tacaka != 1 or broj_et != 1 or (email_lista[email_lista.index("@")+1]) == "." or email_lista[email_lista.index("@")] == 0:
             raise Exception(f"Los unos, email: {email} nije odgovarajuceg oblika")
-    if not telefon.isdecimal():    #provera da li je telefon u validnom obliku
+    if not telefon.isdecimal() and telefon:    #provera da li je telefon u validnom obliku
         raise Exception(f"Los unos, telefon: {telefon} ne moze biti konvertovn u int")
 
     if azuriraj:    #azuriranje svih parametara korisnika
@@ -96,7 +98,7 @@ def kreiraj_korisnika(svi_korisnici: dict, azuriraj: bool, uloga: str, staro_kor
             
             return svi_korisnici
         else:
-            raise Exception(f"Los unos, korisnicko_ime: {korisnicko_ime} vec postoji u svi_korisnici: {svi_korisnici}")
+            raise Exception(f"Los unos, korisnicko_ime: {korisnicko_ime} vec postoji u svi_korisnici")
 
 """
 Funkcija koja čuva podatke o svim korisnicima u fajl na zadatoj putanji sa zadatim separatorom.

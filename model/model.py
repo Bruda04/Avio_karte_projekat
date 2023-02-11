@@ -40,5 +40,5 @@ if __name__ == "__main__":
         "datum_prodaje": datetime,
         "prodavac": str,
         "kupac": str,
-        "sifra_sedista": str,
+        "sediste":str
     }

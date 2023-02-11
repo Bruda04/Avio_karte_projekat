@@ -1,2 +1,10 @@
-lluka,password,Luka,Bradic,menadzer,,,0641234123,lluka@email.com,
-aana,password,Ana,Filipovic,kupac,123456789,srb,0641231234,aana@email.com,f
+lluka|password|Luka|Bradic|admin|||0641234123|lluka@email.com|M
+aana|password|Ana|Filipovic|prodavac|123456789|srb|0641231234|aana@email.com|F
+mmilica|password|Milica|Stanojlovic|korisnik|123456789|srb|064444444|milica@email.com|F
+iivana|password|Ivana|Radovanovic|prodavac|||||
+ddamjan|password|Damjan|Vincic|korisnik|123456789|srb|06455555|d@mail.com|M
+mmaria|password|Maria|Bradic|korisnik|123456789|grk|00000|m@mail.com|F
+nnenad|password|Nenad|Jordovic|prodavac|||||
+zzorica|password|Zorica|Jordovic|korisnik|123456789|srb|000000|z@email.com|F
+mrmi|password|Nikola|Ognjenovic|korisnik|123456789|srb|0640000|n@email.com|M
+ssladjana|password|Sladjana|Mijatovic|korisnik|123456789|srb|0000000|s@gmail.com|F

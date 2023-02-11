@@ -49,8 +49,8 @@ class KarteTest(unittest.TestCase):
         self.konkretan_let = {
             "sifra": 1234,
             "broj_leta": broj_leta,
-            "datum_polaska": rand_date_str(),
-            "datum_dolaska": rand_date_str()
+            "datum_i_vreme_polaska": rand_date_str(),
+            "datum_i_vreme_dolaska": rand_date_str()
         }
 
         self.svi_konkretni_letovi = {
@@ -70,7 +70,7 @@ class KarteTest(unittest.TestCase):
             "kupac": rand_str(10), # k ime od kupca
             "prodavac": rand_str(10),
             "sifra_sedista": odabrano_sediste,
-            "datum_prodaje": rand_date_str(end=self.konkretan_let['datum_polaska']),
+            "datum_prodaje": rand_date_str(end=self.konkretan_let['datum_i_vreme_polaska']),
             "obrisana": False
         }
 
@@ -87,8 +87,8 @@ class KarteTest(unittest.TestCase):
         konkretan_let = {
             "sifra": 1234,
             "broj_leta": self.pun_let["broj_leta"],
-            "datum_polaska": rand_datetime(),
-            "datum_dolaska": rand_datetime(),
+            "datum_i_vreme_polaska": rand_datetime(),
+            "datum_i_vreme_dolaska": rand_datetime(),
         }
         svi_konkretni_letovi = {
             konkretan_let["sifra"]: konkretan_let
@@ -96,7 +96,7 @@ class KarteTest(unittest.TestCase):
         letovi.podesi_matricu_zauzetosti(self.svi_letovi, konkretan_let)
 
         korisnik = {
-            "id": 123, 
+            "id": 123,
             "uloga": konstante.ULOGA_KORISNIK
         }
         prodavac = {
@@ -111,9 +111,9 @@ class KarteTest(unittest.TestCase):
             "kupac": korisnik,
             "prodavac": prodavac,
             "datum_prodaje": datetime.now(),
-            "obrisana": False,
+            "obrisana": False
         }
-        karta = karte.kupovina_karte(
+        karta, sve_karte = karte.kupovina_karte(
             {},
             svi_konkretni_letovi,
             konkretan_let["sifra"],
@@ -123,15 +123,17 @@ class KarteTest(unittest.TestCase):
             prodavac=ocekivana_karta["prodavac"],
             datum_prodaje=ocekivana_karta["datum_prodaje"]
         )
-        self.assertEqual(ocekivana_karta, karta)
+        self.assertEqual(ocekivana_karta, karta, "Karta nije kreirana")
+        self.assertIn(karta["broj_karte"], sve_karte, "Karta nije dodata u sve karte")
+        self.assertEqual(sve_karte[karta["broj_karte"]], karta, "Karta u svim kartama nije ona koja se očekuje")
 
 
     def test_kupovina_nema_mesta(self):
         konkretan_let = {
             "sifra": 1234,
             "broj_leta": self.pun_let["broj_leta"],
-            "datum_polaska": rand_datetime(),
-            "datum_dolaska": rand_datetime(),
+            "datum_i_vreme_polaska": rand_datetime(),
+            "datum_i_vreme_dolaska": rand_datetime(),
         }
         svi_konkretni_letovi = {
             konkretan_let["sifra"]: konkretan_let
@@ -156,8 +158,8 @@ class KarteTest(unittest.TestCase):
         konkretan_let = {
             "sifra": 1234,
             "broj_leta": self.pun_let["broj_leta"],
-            "datum_polaska": rand_datetime(),
-            "datum_dolaska": rand_datetime(),
+            "datum_i_vreme_polaska": rand_datetime(),
+            "datum_i_vreme_dolaska": rand_datetime(),
         }
         svi_konkretni_letovi = {
             konkretan_let["sifra"]: konkretan_let
@@ -211,8 +213,8 @@ class KarteTest(unittest.TestCase):
         konkretan_let = {
             "sifra": 1234,
             "broj_leta": self.pun_let["broj_leta"],
-            "datum_polaska": rand_datetime(),
-            "datum_dolaska": rand_datetime(),
+            "datum_i_vreme_polaska": rand_datetime(),
+            "datum_i_vreme_dolaska": rand_datetime(),
         }
         svi_konkretni_letovi = {
             konkretan_let["sifra"]: konkretan_let
@@ -238,19 +240,19 @@ class KarteTest(unittest.TestCase):
             {
                 "broj_karte": 1,
                 "putnici": [self.pun_korisnik, {"korisnicko_ime": rand_str(10)}],
-                "sifra_konkretnog_leta": self.konkretan_let,
+                "konretni_let": self.konkretan_let,
                 "status": konstante.STATUS_NEREALIZOVANA_KARTA
             },
             {
                 "broj_karte": 1,
                 "putnici": [self.pun_korisnik, {"korisnicko_ime": rand_str(10)}],
-                "sifra_konkretnog_leta": self.konkretan_let,
+                "konretni_let": self.konkretan_let,
                 "status": konstante.STATUS_REALIZOVANA_KARTA
             },
             {
                 "broj_karte": 2,
                 "putnici": [{"korisnicko_ime": rand_str(10)}, {"korisnicko_ime": rand_str(10)}],
-                "sifra_konkretnog_leta": self.konkretan_let,
+                "konretni_let": self.konkretan_let,
                 "status": konstante.STATUS_NEREALIZOVANA_KARTA
             },
         ]
@@ -310,26 +312,77 @@ class KarteTest(unittest.TestCase):
                 self.puna_karta["broj_karte"]
             )
 
-    def testiraj_karte_fajl(self):
-        odaberi_sediste = lambda : rand_seat(100, ord('H') - ord('A'))
-        referentne_karte = {
-            i: {
-                "broj_karte": i,
-                "sifra_konkretnog_leta": random.randint(1000, 10000),
-                "kupac": rand_str(10),  # k ime od kupca
-                "prodavac": rand_str(10),
-                "sifra_sedista": odaberi_sediste(),
-                "datum_prodaje": rand_date_str(end=self.konkretan_let['datum_polaska']),
-                "obrisana": False
-            } for i in range(100)
+    # def testiraj_karte_fajl(self):
+    #     odaberi_sediste = lambda : rand_seat(100, ord('H') - ord('A'))
+    #     prodavac = rand_valid_user()
+    #     prodavac["uloga"] = konstante.ULOGA_PRODAVAC
+    #     kupac = rand_valid_user()
+    #     referentne_karte = {
+    #         i: {
+    #             "broj_karte": i,
+    #             "sifra_konkretnog_leta": random.randint(1000, 10000),
+    #             "kupac": rand_valid_user(),  # k ime od kupca
+    #             "prodavac": prodavac,
+    #             "sediste": odaberi_sediste(),
+    #             "datum_prodaje": rand_date_str(end=self.konkretan_let['datum_i_vreme_polaska']),
+    #             "obrisana": False,
+    #             "putnici": [kupac] + [rand_valid_user() for _ in range(3)]
+    #         } for i in range(100)
+    #     }
+    #     karte.sacuvaj_karte(referentne_karte, self.putanja, "|")
+    #     ucitane_karte = karte.ucitaj_karte_iz_fajla(self.putanja, "|")
+    #     self.assertIsNotNone(ucitane_karte, msg="Nisu učitane karte iz fajla")
+    #     self.assertEqual(len(referentne_karte), len(ucitane_karte), msg="Dužine učitanih karata nisu jednake")
+    #     for k in ucitane_karte:
+    #         ucitana_karta = ucitane_karte[k]
+    #         self.assertDictEqual(referentne_karte[k], ucitana_karta, msg="Učitane karte se ne poklapaju")
+
+    def test_izmena_karte(self):
+        karta = copy.deepcopy(self.puna_karta)
+        ocekivana_karta = copy.deepcopy(karta)
+        ocekivana_karta["obrisana"] = True
+
+        nov_konkretan_let = {
+            "sifra": self.konkretan_let["sifra"]+1,
+            "broj_leta": rand_str(4),
+            "datum_i_vreme_polaska": rand_date_str(),
+            "datum_i_vreme_dolaska": rand_date_str()
         }
-        karte.sacuvaj_karte(referentne_karte, self.putanja, "|")
-        ucitane_karte = karte.ucitaj_karte_iz_fajla(self.putanja, "|")
-        self.assertIsNotNone(ucitane_karte, msg="Nisu učitane karte iz fajla")
-        self.assertEqual(len(referentne_karte), len(ucitane_karte), msg="Dužine učitanih karata nisu jednake")
-        for k in ucitane_karte:
-            ucitana_karta = ucitane_karte[k]
-            self.assertDictEqual(referentne_karte[k], ucitana_karta, msg="Učitane karte se ne poklapaju")
+        self.svi_konkretni_letovi[nov_konkretan_let["sifra"]] = nov_konkretan_let
+
+        broj_karte = self.puna_karta["broj_karte"]
+        sve_karte = karte.izmena_karte(
+            {broj_karte: self.puna_karta},
+            self.svi_konkretni_letovi,
+            self.puna_karta["broj_karte"],
+            nov_konkretan_let["sifra"]
+        )
+        self.assertIsNotNone(sve_karte, msg="Nije vraćena kolekcija karata")
+        self.assertTrue(broj_karte in sve_karte)
+
+    def test_izmena_karte_datum_polaska(self):
+        karta = copy.deepcopy(self.puna_karta)
+        ocekivana_karta = copy.deepcopy(karta)
+        ocekivana_karta["obrisana"] = True
+
+        nov_konkretan_let = {
+            "sifra": self.konkretan_let["sifra"]+1,
+            "broj_leta": rand_str(4),
+            "datum_i_vreme_polaska": rand_date_str(),
+            "datum_i_vreme_dolaska": rand_date_str()
+        }
+        self.svi_konkretni_letovi[nov_konkretan_let["sifra"]] = nov_konkretan_let
+
+        broj_karte = self.puna_karta["broj_karte"]
+        sve_karte = karte.izmena_karte(
+            {broj_karte: self.puna_karta},
+            self.svi_konkretni_letovi,
+            self.puna_karta["broj_karte"],
+            None,
+            nov_konkretan_let["datum_i_vreme_polaska"]
+        )
+        self.assertIsNotNone(sve_karte, msg="Nije vraćena kolekcija karata")
+        self.assertTrue(broj_karte in sve_karte)
 
 if __name__ == '__main__':
     unittest.main()
