@@ -22,5 +22,5 @@ Testovi se nalaze u paketu test. Pokretanje testova je moguće na tri načina:
 ## Napomena
 Nakon završetka semestra neki od testova sadržali su greške i bili su kontradiktorni u odnosu na strukturu projekta, zbog toga su na kraju stavljeni pod komentar i ne nalaze se u konačnoj verziji projekta.
 
-##Ocena
+## Ocena
 Projekat je uz usmeni teorijski deo dobio ocenu 10.
