@@ -18,3 +18,9 @@ Testovi se nalaze u paketu test. Pokretanje testova je moguće na tri načina:
 1. Svi testovi: desni klik na test ili paket fajl > Run (Debug) Pythin tests in...
 2. Pojedinačni testovi: desni klik na funkciju sa individualnim testom > Run (Debug) Pythin tests in...
 3. Svi testovi (CLI): Pozivom `python -m unittest` u komandnoj liniji pozicioniranoj u korenu projekta. **Za krajnje ocenjivanje se koristi ovaj metod.**
+
+## Napomena
+Nakon završetka semestra neki od testova sadržali su greške i bili su kontradiktorni u odnosu na strukturu projekta, zbog toga su na kraju stavljeni pod komentar i ne nalaze se u konačnoj verziji projekta.
+
+##Ocena
+Projekat je uz usmeni teorijski deo dobio ocenu 10.
